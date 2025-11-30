@@ -444,15 +444,41 @@ def crear_mapa_ruta(path, airports):
         max_lon=lon_max + lon_margin,
     )
 
-    route_coords = list(zip(lats, lons))
-    folium.PolyLine(
-        locations=route_coords,
-        color="#00d4ff",
-        weight=4,
-        opacity=0.9,
-        popup="Ruta aérea",
-        dash_array="5, 10",
-    ).add_to(m)
+    # Dibujar cada arista con su peso (km) como tooltip
+    for i in range(len(path) - 1):
+        u = path[i]
+        v = path[i + 1]
+        info_u = airports[u]
+        info_v = airports[v]
+
+        seg_coords = [
+            [info_u["lat"], info_u["lon"]],
+            [info_v["lat"], info_v["lon"]],
+        ]
+
+        # Obtener el peso de la arista desde el grafo (kilómetros)
+        try:
+            w = G[u][v].get("weight", None)
+        except Exception:
+            w = None
+
+        label = f"{w:.2f} km" if isinstance(w, (int, float)) else "Distancia"
+
+        folium.PolyLine(
+            locations=seg_coords,
+            color="#00d4ff",
+            weight=4,
+            opacity=0.9,
+            dash_array="5, 10",
+            tooltip=folium.Tooltip(
+                f"<div style='background: rgba(2,22,60,0.9); padding: 6px 8px; border: 1px solid #00d4ff; border-radius: 6px; color:#e0f7ff; font-size:12px;'>\n"
+                f"<strong>Tramo:</strong> {u} → {v}<br/>\n"
+                f"<strong>Peso:</strong> {label}\n"
+                f"</div>",
+                sticky=True,
+                direction="top",
+            ),
+        ).add_to(m)
 
     for i, aid in enumerate(path):
         info = airports[aid]
