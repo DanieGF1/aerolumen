@@ -1,6 +1,8 @@
 streamlit
 networkx
-mysql-connector-python
 folium
 streamlit-folium
+mysql-connector-python
 python-dotenv
+
+
