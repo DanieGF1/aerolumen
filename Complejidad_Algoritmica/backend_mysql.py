@@ -4,6 +4,10 @@ from datetime import datetime
 import os
 from dotenv import load_dotenv
 
+# Cargar variables del .env cuando se ejecuta localmente
+load_dotenv()
+
+# Intentar cargar secrets si estamos en Streamlit Cloud
 try:
     import streamlit as st
     SECRETS = st.secrets
@@ -33,7 +37,6 @@ DB_CONFIG = {
 
 def get_connection():
     return mysql.connector.connect(**DB_CONFIG)
-
 
 def get_user_profile(email: str):
     conn = None
@@ -299,4 +302,5 @@ def delete_route_for_user(email: str, route_id: int) -> bool:
             cursor.close()
         if conn:
             conn.close()
+
 
