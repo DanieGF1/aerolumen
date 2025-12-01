@@ -4,15 +4,31 @@ from datetime import datetime
 import os
 from dotenv import load_dotenv
 
+try:
+    import streamlit as st
+    SECRETS = st.secrets
+except Exception:
+    SECRETS = {}
 
-load_dotenv()
+def get_setting(key: str, default: str | None = None) -> str | None:
+    """
+    Primero busca en variables de entorno (os.getenv),
+    si no hay nada prueba en st.secrets,
+    y si tampoco, usa el default.
+    """
+    val = os.getenv(key)
+    if val is not None:
+        return val
+    if key in SECRETS:
+        return str(SECRETS[key])
+    return default
 
 DB_CONFIG = {
-    "host": os.getenv("DB_HOST"),
-    "user": os.getenv("DB_USER"),
-    "password": os.getenv("DB_PASSWORD"),
-    "database": os.getenv("DB_NAME"),
-    "port": int(os.getenv("DB_PORT")),
+    "host": get_setting("DB_HOST", "localhost"),
+    "user": get_setting("DB_USER", "root"),
+    "password": get_setting("DB_PASSWORD", ""),
+    "database": get_setting("DB_NAME", "railway"),
+    "port": int(get_setting("DB_PORT", "3306")),
 }
 
 def get_connection():
@@ -283,3 +299,4 @@ def delete_route_for_user(email: str, route_id: int) -> bool:
             cursor.close()
         if conn:
             conn.close()
+
