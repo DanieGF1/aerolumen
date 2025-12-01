@@ -2,17 +2,13 @@ import mysql.connector
 from mysql.connector import Error
 from datetime import datetime
 import os
-from dotenv import load_dotenv
 
-# Cargar variables del .env cuando se ejecuta localmente
-load_dotenv()
-
-# Intentar cargar secrets si estamos en Streamlit Cloud
 try:
     import streamlit as st
     SECRETS = st.secrets
 except Exception:
     SECRETS = {}
+
 
 def get_setting(key: str, default: str | None = None) -> str | None:
     """
@@ -27,6 +23,7 @@ def get_setting(key: str, default: str | None = None) -> str | None:
         return str(SECRETS[key])
     return default
 
+
 DB_CONFIG = {
     "host": get_setting("DB_HOST", "localhost"),
     "user": get_setting("DB_USER", "root"),
@@ -35,8 +32,10 @@ DB_CONFIG = {
     "port": int(get_setting("DB_PORT", "3306")),
 }
 
+
 def get_connection():
     return mysql.connector.connect(**DB_CONFIG)
+
 
 def get_user_profile(email: str):
     conn = None
@@ -62,6 +61,7 @@ def get_user_profile(email: str):
             cursor.close()
         if conn:
             conn.close()
+
 
 
 def update_user_profile(email: str, full_name: str, avatar_url: str):
@@ -302,5 +302,6 @@ def delete_route_for_user(email: str, route_id: int) -> bool:
             cursor.close()
         if conn:
             conn.close()
+
 
 
